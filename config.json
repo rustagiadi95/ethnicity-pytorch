@@ -1,0 +1,42 @@
+{
+    "model" : {
+        "model_params" : {
+            "model_output_dim" : 95,
+            "lstm_output_dim" : 200,
+            "max_time_steps" : 60,
+            "ngram_params" : [{
+                "vocab_len" : 42,
+                "embed_dim" : 30
+            }, {
+                "vocab_len" : 925,
+                "embed_dim" : 100
+            }, {
+                "vocab_len" : 8573,
+                "embed_dim" : 300
+            }
+        ]},
+        "layers"  : [
+            "Embedding",
+            "Embedding",
+            "Embedding",
+            "Lstm",
+            "Lstm",
+            "Lstm",
+            "Linear",
+            "Dropout",
+            "Dropout",
+            "Dropout"
+        ]
+    }, 
+    "training_params" : {
+        "is_train" : "True",
+        "start_epoch" : 45,
+        "batch_size" : 1,
+        "end_epoch" : 100,
+        "decay_rate" : 0.99,
+        "train_embeddings" : "True",
+        "early_stopping" : "True",
+        "early_stop_window" : 15
+    }
+}
+
