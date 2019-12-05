@@ -39,11 +39,11 @@ if training_params["is_train"] == "True" :
     # Creating Dataset
     print("Creating Training Dataset")
     train_loader = dataset.create_dataloader('train', training_params["batch_size"], shuffle=True)
-    valid_loader = dataset.create_dataloader('valid')
+    valid_loader = dataset.create_dataloader('valid', shuffle=False)
 
     # Training
     print("Training the model")
-    optimizer = optim.Adam(Nationality_model.parameters(), lr = 0.01)
+    optimizer = optim.Adam(Nationality_model.parameters(), lr = 0.001)
     criterion = nn.CrossEntropyLoss()
 
     train_logs = open(os.path.join(globals.LOG_DIR, 'training_logs.txt'), 'a')
@@ -70,8 +70,8 @@ if training_params["is_train"] == "True" :
         for idx, (data_sample) in enumerate(train_loader):
             Nationality_model.zero_grad()
             data_sample = [items.to(globals.device).long() for items in data_sample]
-            output = Nationality_model(data_sample[:3])
-            loss = criterion(output, data_sample[3])
+            output = Nationality_model(data_sample[:4])
+            loss = criterion(output, data_sample[4])
             loss.backward()
             nn.utils.clip_grad_norm_(Nationality_model.parameters(), 5)
             optimizer.step()
@@ -93,11 +93,11 @@ if training_params["is_train"] == "True" :
             correct_list = []
             for idx, (data_sample) in enumerate(valid_loader):
                 data_sample = [items.to(globals.device).long() for items in data_sample]
-                output = Nationality_model(data_sample[:3])
+                output = Nationality_model(data_sample[:4])
                 _, top1pred = torch.max(output, 1)
-                if top1pred.item() == data_sample[3].item():
+                if top1pred.item() == data_sample[4].item():
                     accuracy += 1
-                correct_list.append((idx, top1pred.item(), data_sample[3].item()))
+                correct_list.append((idx, top1pred.item(), data_sample[4].item()))
             if accuracy > max_accuracy :
                 max_accuracy = accuracy
                 best_metric_logs = open(os.path.join(globals.LOG_DIR, 'best_metric_results.txt'), 'w')
@@ -136,11 +136,11 @@ else :
         correct_list = []
         for idx, (data_sample) in enumerate(test_loader):
             data_sample = [items.to(globals.device).long() for items in data_sample]
-            output = Nationality_model(data_sample[:3])
+            output = Nationality_model(data_sample[:4])
             _, top1pred = torch.max(output, 1)
-            if top1pred.item() == data_sample[3].item():
+            if top1pred.item() == data_sample[4].item():
                 accuracy += 1
-            correct_list.append((idx, top1pred.item(), data_sample[3].item()))
+            correct_list.append((idx, top1pred.item(), data_sample[4].item()))
         string = 'Testing Accuracy after training for {} epochs : {}' \
                   .format(weights_list[-1], accuracy*100/len(test_loader))
         print(string)

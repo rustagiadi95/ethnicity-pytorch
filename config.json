@@ -30,8 +30,8 @@
     }, 
     "training_params" : {
         "is_train" : "True",
-        "start_epoch" : 45,
-        "batch_size" : 1,
+        "start_epoch" : 1,
+        "batch_size" : 32,
         "end_epoch" : 100,
         "decay_rate" : 0.99,
         "train_embeddings" : "True",

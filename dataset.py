@@ -1,8 +1,11 @@
 import  globals
 import re
 import numpy as np
+import json
 
 from torch.utils.data import Dataset, DataLoader
+
+model_json = json.load(open('config.json'))["model"]
 
 def create_ngrams(ngram = 'unigram') :
     path = globals.paths[ngram.replace('gram', '') + '2idx_path']
@@ -36,7 +39,7 @@ def create_country_dict(entity = 'idx'):
         return country2entity    
 
 def create_dataloader(mode='train', batch_size = 1, shuffle=True):
-    dataset = EthnicityDataset(mode)
+    dataset = EthnicityDataset(mode, batch_size)
     dataloader = DataLoader(dataset, batch_size, shuffle=True)
     return dataloader
 
@@ -47,8 +50,8 @@ trigrams = create_ngrams('trigram')
 countrydict = create_country_dict('idx')
 
 class EthnicityDataset(Dataset) :
-    def __init__(self, mode) :
-        
+    def __init__(self, mode, batch_size) :
+        self.batch_size = batch_size
         path = globals.paths['data_cleaned_'+mode]
         data = open(path, 'r')
         self.data = []
@@ -69,6 +72,16 @@ class EthnicityDataset(Dataset) :
         trigram = [trigrams[0][c1+c2+c3] if c1+c2+c3 in trigrams[0] else 0 
                    for c1, c2, c3 in zip(*[inp[0][i:] for i in range(3)])]
         label = countrydict[0][inp[1]]
+        
+        
+        for i in range(model_json["model_params"]["max_time_steps"] - len(unigram)) :
+            unigram.append(1)
+        for i in range(model_json["model_params"]["max_time_steps"] - len(bigram)) :
+            bigram.append(1)
+        for i in range(model_json["model_params"]["max_time_steps"] - len(trigram)) :
+            trigram.append(1)
+        
+        return np.array(unigram), np.array(bigram), np.array(trigram), len(inp[0]), label
+        
 
-        return np.array(unigram), np.array(bigram), np.array(trigram), label
 

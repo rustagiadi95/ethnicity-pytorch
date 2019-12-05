@@ -30,9 +30,9 @@ class Nationality_Model(nn.Module):
                 )
             elif type_of_layer == "Lstm" :
                 self.lstm_layers.append(
-                    nn.LSTMCell(
+                    nn.LSTM(
                         model_json["model_params"]["ngram_params"][index % self.ngrams]["embed_dim"],
-                        model_json["model_params"]["lstm_output_dim"]
+                        model_json["model_params"]["lstm_output_dim"], batch_first=True
                     )
                 )
             elif type_of_layer == 'Dropout' :
@@ -46,17 +46,17 @@ class Nationality_Model(nn.Module):
                 )
 
     def forward(self, x):
-        li_embed = [self.embedding_layers[i](x[i]) for i in range(len(x))]
-        lstm_output = [self.run_cell(li_embed[i], self.lstm_layers[i], self.dropout[i]) for i in range(len(x))]
+        li_embed = [self.embedding_layers[i](x[i]) for i in range(len(x) - 1)]
+        lstm_output = [self.run_cell(li_embed[i], self.lstm_layers[i], self.dropout[i], x[3]) for i in range(len(x) - 1)]
         linear_input = torch.cat(lstm_output, dim = 1)
         out = self.linear[0](linear_input)
         return F.softmax(out, dim = 1)
 
-    def run_cell(self, tensor, layer, dropout):        
-        for i in tensor[0] :
-            output, state = layer(i.unsqueeze(0))
-            output = dropout(output)
-        return output
+    def run_cell(self, tensor, layer, dropout, input_len):
+        output, _ = layer(tensor)
+        spread_len = torch.arange(0, input_len.shape[0]).float().to(globals.device) * model_json["model_params"]['max_time_steps'] + input_len - 1
+        gathered_outputs = torch.index_select(output.reshape(-1, model_json["model_params"]["lstm_output_dim"]), 0, spread_len.long())
+        return gathered_outputs
 
 def initialize_embeddings(embedding_layers, device):
 
