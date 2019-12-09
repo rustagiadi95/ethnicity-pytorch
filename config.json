@@ -12,7 +12,7 @@
                 "embed_dim" : 100
             }, {
                 "vocab_len" : 8573,
-                "embed_dim" : 300
+                "embed_dim" : 130
             }
         ]},
         "layers"  : [
@@ -29,10 +29,10 @@
         ]
     }, 
     "training_params" : {
-        "is_train" : "True",
-        "start_epoch" : 1,
+        "is_train" : "False",
+        "start_epoch" : 201,
         "batch_size" : 32,
-        "end_epoch" : 100,
+        "end_epoch" : 300,
         "decay_rate" : 0.99,
         "train_embeddings" : "True",
         "early_stopping" : "True",

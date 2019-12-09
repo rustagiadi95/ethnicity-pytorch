@@ -74,7 +74,7 @@ def initialize_embeddings(embedding_layers, device):
             sentences.append([''.join(list(items)) for items in zip(*[name[i:] for i in range(ngram + 1)])])
         temp = np.zeros((items.num_embeddings, items.embedding_dim))
         # print(sentences)
-        model = gensim.models.Word2Vec(sentences, size = items.embedding_dim, window=5, min_count=1, workers=3, iter=5)
+        model = gensim.models.Word2Vec(sentences, size = items.embedding_dim, window=5, min_count=0, iter=10)
         ngram2idx, idx2ngram = dataset.create_ngrams(idx2gram_mapping[ngram])
 
         for i in range(2, len(idx2ngram)):

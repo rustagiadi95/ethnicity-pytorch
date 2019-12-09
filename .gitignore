@@ -1,3 +1,4 @@
-saved_weights/
 to_do.txt
 __pycache__/
+draw_metrics.py
+.ipynb_checkpoints/
